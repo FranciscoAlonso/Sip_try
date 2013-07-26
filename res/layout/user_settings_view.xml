@@ -1,0 +1,43 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/user_settings_view"
+	android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".UserSettingsFragment"
+    >
+	<EditText  
+		android:id="@+id/edit_username"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:hint="@string/username" />
+	   
+	<EditText android:id="@+id/edit_password"
+	      android:layout_width="wrap_content"
+	      android:layout_height="wrap_content"
+	      android:hint="@string/password" />
+	   
+	<EditText android:id="@+id/edit_domain"
+	      android:layout_width="fill_parent"
+	      android:layout_height="wrap_content"
+	      android:hint="@string/domain" />	   
+	      
+	<EditText android:id="@+id/edit_server"
+	      android:layout_width="fill_parent"
+	      android:layout_height="wrap_content"
+	      android:hint="@string/server" />
+	
+	<Button
+			android:id="@+id/register_2"  
+			android:layout_width="fill_parent"  
+			android:layout_height="wrap_content"  
+			android:text="@string/register"  
+			android:onClick="onButtonClick"
+	    />
+	<TextView 
+    android:id="@+id/textview"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    />
+</LinearLayout>
