@@ -15,7 +15,6 @@ import android.os.Bundle;
 //import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -134,20 +133,10 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
     }
     
     public void initiateProfile(){
-    	if(SipManager.isApiSupported(this)){ 
-    		Toast.makeText(this, "API", Toast.LENGTH_SHORT).show();
-    	}else{
-    		Toast.makeText(this, "NO API", Toast.LENGTH_SHORT).show();
-    	}
     	if(username.length()==0 || pass.length()==0 || domain.length()==0 || server.length()==0){
-    		if(SipManager.isApiSupported(this)){ 
-        		Toast.makeText(this, "No API", Toast.LENGTH_SHORT).show();
-        	}
-    		//Toast.makeText(this, "Update settings", Toast.LENGTH_SHORT).show();
-    	}else {
+    		Toast.makeText(this, "Update settings", Toast.LENGTH_SHORT).show();
+    	}else{
 	    	try {
-	    		
-	    		
 	    		username = "bob";
 	    		pass = "abc456";
 	    		domain = "cicore219.icaro.ciens.ucv.ve";
@@ -159,28 +148,27 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
 	            Intent i = new Intent();
 	            i.setAction("android.SipDemo.INCOMING_CALL");
 	            PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, Intent.FILL_IN_DATA);
-	            //manager.register(me, 20, null);
 	            manager.open(me, pi, null);
 	            
 	            manager.setRegistrationListener(me.getUriString(), new SipRegistrationListener() {
 	                public void onRegistering(String localProfileUri) {
-	                	Log.e("SIP", "Registering ... ");
+	                    
 	                }
 	
 	                public void onRegistrationDone(String localProfileUri, long expiryTime) {
-	                    Log.e("SIP", "Success");
+	                    
 	                }
 	
 	                public void onRegistrationFailed(String localProfileUri, int errorCode,
 	                        String errorMessage) {
-	                	Log.e("SIP", "Registration Failed");
+	                    
 	                }
 	            });
 	            
 	    	}catch(ParseException pe){
-	    		Log.e("SIP", "SIP conection error");
+	            
 	        }catch (SipException se) {
-	        	Log.e("SIP", "SIP conection error");
+	          
 	        }
     	}
     }
