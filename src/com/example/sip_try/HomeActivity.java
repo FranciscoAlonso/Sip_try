@@ -6,6 +6,7 @@ import java.text.ParseException;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.net.sip.SipAudioCall;
 import android.net.sip.SipException;
 import android.net.sip.SipManager;
 import android.net.sip.SipProfile;
@@ -15,15 +16,19 @@ import android.os.Bundle;
 //import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
+
 //import com.example.sip_try.UserSettingsFragment;
 import com.example.sip_try.UserSettingsFragment.UserSettingsInterface;
 
 public class HomeActivity extends FragmentActivity implements UserSettingsInterface{
+	public static final String LCAT = "SIPClient";
 	
 	public final static int USER_SETTINGS = 1;
 	public final static int ADVANCED_SETTINGS = 2;
@@ -35,6 +40,7 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
 	
     public SipManager manager = null;
     public SipProfile me = null;
+    public SipAudioCall call = null;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +67,12 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
     	//UserSettingsFragment fragment = (UserSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.user_settings_view);
     	
     	Toast.makeText(this, "POTOI " + username, Toast.LENGTH_SHORT).show();
+    }
+    
+    public void onRegisterClick(View view){
+    	//UserSettingsFragment fragment = (UserSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.user_settings_view);
+    	initiateProfile();
+    	//Toast.makeText(this, "POTOI " + username, Toast.LENGTH_SHORT).show();
     }
     
     public void click_register(View view){
@@ -133,44 +145,52 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
     }
     
     public void initiateProfile(){
-    	if(username.length()==0 || pass.length()==0 || domain.length()==0 || server.length()==0){
+    	/*if(username.length()==0 || pass.length()==0 || domain.length()==0 || server.length()==0){
     		Toast.makeText(this, "Update settings", Toast.LENGTH_SHORT).show();
-    	}else{
+    	}else{*/
 	    	try {
-	    		username = "bob";
-	    		pass = "abc456";
-	    		domain = "cicore219.icaro.ciens.ucv.ve";
-	    		server = "190.169.74.219";
+	    		username = "alice";
+	    		pass = "123456";
+	    		domain = "192.168.1.6";
+	    		server = "192.168.1.6";
 	            SipProfile.Builder builder = new SipProfile.Builder(username, domain);
 	            builder.setPassword(pass);
+	            //builder.setAutoRegistration(false);
+	            builder.setSendKeepAlive(true);
 	            me = builder.build();
 	            
 	            Intent i = new Intent();
-	            i.setAction("android.SipDemo.INCOMING_CALL");
+	            i.setAction("com.example.sip_try.INCOMING_CALL");
 	            PendingIntent pi = PendingIntent.getBroadcast(this, 0, i, Intent.FILL_IN_DATA);
 	            manager.open(me, pi, null);
 	            
+	            
 	            manager.setRegistrationListener(me.getUriString(), new SipRegistrationListener() {
 	                public void onRegistering(String localProfileUri) {
-	                    
+	                	Log.d(LCAT, "registrando");
+	                	//Toast.makeText(getBaseContext(), "Registrando " + username, Toast.LENGTH_SHORT).show();
 	                }
 	
 	                public void onRegistrationDone(String localProfileUri, long expiryTime) {
-	                    
+	                	Log.d(LCAT, "registrado");
+	                	//Toast.makeText(getBaseContext(), "Registrado " + username, Toast.LENGTH_SHORT).show();
 	                }
 	
 	                public void onRegistrationFailed(String localProfileUri, int errorCode,
 	                        String errorMessage) {
-	                    
+	                	Log.e(LCAT, "Register FAILED" + errorCode + " " + errorMessage);
+	                	//Toast.makeText(getBaseContext(), "No Registrado " + username, Toast.LENGTH_SHORT).show();
 	                }
 	            });
-	            
+	            //manager.register(me, 30, null);
+	            Toast.makeText(this, "Initiated... " + username, Toast.LENGTH_SHORT).show();
 	    	}catch(ParseException pe){
-	            
+	    		Toast.makeText(this, "ERROR 1", Toast.LENGTH_SHORT).show();
 	        }catch (SipException se) {
-	          
+	        	Toast.makeText(this, "ERROR 2 " + se.toString(), Toast.LENGTH_SHORT).show();
+	        	//Log.e(LCAT, "Register FAILED " + se.toString());
 	        }
-    	}
+    	//}
     }
     
 	@Override
@@ -187,8 +207,25 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
 		setServer(aux.getText().toString());
 		
 		//Toast.makeText(this, "POTOI " + username, Toast.LENGTH_SHORT).show();
-		initiateProfile();
+		
 		
 	}   
     
+	public void updateStatus(final String status) {
+        // Be a good citizen.  Make sure UI changes fire on the UI thread.
+        /*this.runOnUiThread(new Runnable() {
+            public void run() {
+                TextView labelView = (TextView) findViewById(R.id.sipLabel);
+                labelView.setText(status);
+            }
+        });*/
+    }
+	public void updateStatus(SipAudioCall call) {
+        String useName = call.getPeerProfile().getDisplayName();
+        if(useName == null) {
+          useName = call.getPeerProfile().getUserName();
+        }
+        updateStatus(useName + "@" + call.getPeerProfile().getSipDomain());
+    }
+	
 }

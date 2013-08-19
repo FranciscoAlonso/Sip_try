@@ -34,4 +34,14 @@
     android:onClick="onMyButtonClick"
     android:text="@string/call_button" />
 
+<Button
+    android:id="@+id/login"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignRight="@+id/register"
+    android:layout_below="@+id/register"
+    android:layout_marginTop="22dp"
+    android:onClick="onRegisterClick"
+    android:text="@string/login" />
+
 </RelativeLayout>

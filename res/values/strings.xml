@@ -6,12 +6,13 @@
     <string name="hello_world">Hello world!</string>
     <string name="call_button">CALL</string>
     <string name="extension">Extension</string>
-    <string name="register">Login</string>
+    <string name="register">Settings</string>
     <string name="title_activity_register">RegisterActivity</string>
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="domain">Domain</string>
     <string name="server">Server</string>
+    <string name="login">Login</string>
 
 </resources>
 
