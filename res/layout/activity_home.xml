@@ -44,4 +44,14 @@
     android:onClick="onRegisterClick"
     android:text="@string/login" />
 
+<Button
+    android:id="@+id/logout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignBaseline="@+id/login"
+    android:layout_alignBottom="@+id/login"
+    android:layout_alignLeft="@+id/call"
+    android:onClick="closeLocalProfile"
+    android:text="@string/logout" />
+
 </RelativeLayout>

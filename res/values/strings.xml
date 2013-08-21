@@ -13,6 +13,7 @@
     <string name="domain">Domain</string>
     <string name="server">Server</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
 
 </resources>
 

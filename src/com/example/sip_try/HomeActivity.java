@@ -6,6 +6,7 @@ import java.text.ParseException;
 
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.net.sip.SipAudioCall;
 import android.net.sip.SipException;
 import android.net.sip.SipManager;
@@ -20,6 +21,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +43,8 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
     public SipManager manager = null;
     public SipProfile me = null;
     public SipAudioCall call = null;
+    public IncomingCallReceiver callReceiver;
+    public String sipAddress = null;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +55,14 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
             // Show the Up button in the action bar.
             getActionBar().setDisplayHomeAsUpEnabled(true);
         }*/
+        
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("com.example.sip_try.INCOMING_CALL");
+        callReceiver = new IncomingCallReceiver();
+        this.registerReceiver(callReceiver, filter);
+        
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        
         initializeManager();
         
     }
@@ -65,8 +77,9 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
     
     public void onMyButtonClick(View view){
     	//UserSettingsFragment fragment = (UserSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.user_settings_view);
-    	
-    	Toast.makeText(this, "POTOI " + username, Toast.LENGTH_SHORT).show();
+    	sipAddress = "6002@192.168.1.6";
+    	initiateCall();
+    	Toast.makeText(this, "Llamando a " + sipAddress, Toast.LENGTH_SHORT).show();
     }
     
     public void onRegisterClick(View view){
@@ -152,7 +165,10 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
 	    		username = "alice";
 	    		pass = "123456";
 	    		domain = "192.168.1.6";
+	    		//domain = "200.44.248.98";
 	    		server = "192.168.1.6";
+	    		//server = "200.44.248.98";
+	    		
 	            SipProfile.Builder builder = new SipProfile.Builder(username, domain);
 	            builder.setPassword(pass);
 	            //builder.setAutoRegistration(false);
@@ -193,6 +209,23 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
     	//}
     }
     
+    public void closeLocalProfile(View view) {
+    	//Toast.makeText(this, "LOGOUT", Toast.LENGTH_SHORT).show();
+        if (manager == null) {
+        	Log.d(LCAT, "No localprofile.");
+            return;
+        }
+        try {
+            if (me != null) {
+                manager.close(me.getUriString());
+                manager.unregister(me, null);
+                Log.d(LCAT, "Localprofile CLOSED.");
+            }
+        } catch (Exception ee) {
+            Log.e(LCAT, "Failed to close local profile. " + ee);
+        }
+    }
+    
 	@Override
 	public void onSaveClick() {
 		// TODO Auto-generated method stub
@@ -211,6 +244,51 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
 		
 	}   
     
+	public void initiateCall() {
+		//EditText aux = (EditText) findViewById(R.id.edit_server);
+		//sipAddress = aux.getText().toString();
+				
+        //updateStatus(sipAddress);
+
+        try {
+            SipAudioCall.Listener listener = new SipAudioCall.Listener() {
+                // Much of the client's interaction with the SIP Stack will
+                // happen via listeners.  Even making an outgoing call, don't
+                // forget to set up a listener to set things up once the call is established.
+                @Override
+                public void onCallEstablished(SipAudioCall call) {
+                    call.startAudio();
+                    call.setSpeakerMode(true);
+                    call.toggleMute();
+                    updateStatus(call);
+                }
+
+                @Override
+                public void onCallEnded(SipAudioCall call) {
+                    updateStatus("Ready.");
+                }
+            };
+
+            call = manager.makeAudioCall(me.getUriString(), sipAddress, listener, 30);
+
+        }
+        catch (Exception e) {
+            Log.i("WalkieTalkieActivity/InitiateCall", "Error when trying to close manager.", e);
+            if (me != null) {
+                try {
+                    manager.close(me.getUriString());
+                } catch (Exception ee) {
+                    Log.i("WalkieTalkieActivity/InitiateCall",
+                            "Error when trying to close manager.", ee);
+                    ee.printStackTrace();
+                }
+            }
+            if (call != null) {
+                call.close();
+            }
+        }
+    }
+	
 	public void updateStatus(final String status) {
         // Be a good citizen.  Make sure UI changes fire on the UI thread.
         /*this.runOnUiThread(new Runnable() {
