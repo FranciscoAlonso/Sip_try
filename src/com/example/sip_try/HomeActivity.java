@@ -7,6 +7,7 @@ import java.text.ParseException;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.rtp.AudioCodec;
 import android.net.sip.SipAudioCall;
 import android.net.sip.SipException;
 import android.net.sip.SipManager;
@@ -78,13 +79,17 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
     public void onMyButtonClick(View view){
     	//UserSettingsFragment fragment = (UserSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.user_settings_view);
     	sipAddress = "6002@192.168.1.6";
+    	//sipAddress = "6002@200.44.248.98";
     	initiateCall();
-    	Toast.makeText(this, "Llamando a " + sipAddress, Toast.LENGTH_SHORT).show();
+    	
+    	//AudioCodec ac[] = AudioCodec.getCodecs();
+    	Toast.makeText(this, "CODEC:" + sipAddress, Toast.LENGTH_SHORT).show();
     }
     
     public void onRegisterClick(View view){
     	//UserSettingsFragment fragment = (UserSettingsFragment) getSupportFragmentManager().findFragmentById(R.id.user_settings_view);
     	initiateProfile();
+    	
     	//Toast.makeText(this, "POTOI " + username, Toast.LENGTH_SHORT).show();
     }
     
@@ -257,9 +262,10 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
                 // forget to set up a listener to set things up once the call is established.
                 @Override
                 public void onCallEstablished(SipAudioCall call) {
-                    call.startAudio();
-                    call.setSpeakerMode(true);
-                    call.toggleMute();
+                	call.setListener(this);
+                	call.startAudio();
+                    //call.setSpeakerMode(true);
+                    if(call.isMuted()) call.toggleMute();
                     updateStatus(call);
                 }
 
@@ -270,6 +276,7 @@ public class HomeActivity extends FragmentActivity implements UserSettingsInterf
             };
 
             call = manager.makeAudioCall(me.getUriString(), sipAddress, listener, 30);
+            //call.startAudio();
 
         }
         catch (Exception e) {
